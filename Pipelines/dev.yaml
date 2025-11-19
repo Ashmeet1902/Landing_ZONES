@@ -1,0 +1,103 @@
+trigger:
+  branches:
+    include:
+      - feature/*
+      - master
+      - feature/vms
+
+pool: Runner
+
+variables:
+  workDir: '$(System.DefaultWorkingDirectory)/Envirments/dev'
+
+stages:
+- stage: Build
+  displayName: Build
+  jobs:       
+  - job: TerraformInitPlan
+    displayName: Terraform Init and Plan Job
+    steps: 
+    - task: TerraformInstaller@1
+      inputs:
+        terraformVersion: '1.13.5'
+
+    - task: TerraformTask@5
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: $(workDir)
+        backendServiceArm: 'ADO1'
+        backendAzureRmResourceGroupName: 'BackendResourceGroup'
+        backendAzureRmStorageAccountName: 'backendstorageacc15078'
+        backendAzureRmContainerName: 'backendcontainer'
+        backendAzureRmKey: 'dev.terraform.tfstate'
+
+    - task: TerraformTask@5
+      inputs:
+        provider: 'azurerm'
+        command: 'plan'
+        workingDirectory: $(workDir)
+        environmentServiceNameAzureRM: 'ADO1'
+- stage: Scanning
+  displayName: Scanning
+  jobs: 
+  - job: TFSecScanningJob
+    displayName: TFSEC Scanning
+    pool: Runner
+    steps:
+    - task: tfsec@1
+      inputs:
+        version: 'v1.26.0'
+        dir: $(workDir)
+        softFail: true
+    - task: PublishPipelineArtifact@1
+      displayName: Publish tfsec report (artifact)
+      inputs:
+        targetPath: 'tfsec-report'   # folder or file created by tfsec task
+        artifact: 'tfsec-report'
+
+  - job: TfLintScanningJob
+    displayName: TFLINT Scanning Wala Job
+    pool: RUNNER
+    steps:
+    - task: CmdLine@2
+      inputs:
+        script: 'echo Hello world'
+
+- stage: Deploy
+  displayName: Deploy
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+  jobs:
+  - job: ManualValidation
+    displayName: Manual Validation kardo Please
+    pool: server               # <<-- must be agentless for ManualValidation task to work
+    steps:
+    - task: ManualValidation@1
+      inputs:
+        notifyUsers: 'rakesh-ranjan@newgensoft.com'
+        approvers: 'rakesh-ranjan@newgensoft.com'
+        instructions: 'Plan check karlo sir...'
+        timeoutInMinutes: 60
+
+  - job: TerraformApply
+    displayName: Terraform Apply wala Job
+    dependsOn: ManualValidation
+    pool: Runner               # agent pool for running Terraform
+    steps:
+    - checkout: self
+    - task: TerraformTask@5
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: $(workDir)
+        backendServiceArm: 'ADO1'
+        backendAzureRmResourceGroupName: 'BackendResourceGroup'
+        backendAzureRmStorageAccountName: 'backendstorageacc15078'
+        backendAzureRmContainerName: 'backendcontainer'
+        backendAzureRmKey: 'dev.terraform.tfstate'
+    - task: TerraformTask@5
+      inputs:
+        provider: 'azurerm'
+        command: 'apply'
+        workingDirectory: $(workDir)
+        environmentServiceNameAzureRM: 'ADO1'
