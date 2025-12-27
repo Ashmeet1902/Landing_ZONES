@@ -136,3 +136,27 @@ variable "storage_accounts" {
     tags                     = map(string)
   }))
 }
+variable "sql_servers" {
+  type = map(object({
+    name                         = string
+    resource_group_name          = string
+    location                     = string
+    version                      = string
+    administrator_login          = string
+    administrator_login_password = string
+    tags                         = map(string)
+  }))
+
+}
+variable "sql_databases" {
+  type = map(object({
+    name                = string
+    server_name         = string
+    resource_group_name = string
+    sku_name            = string
+    max_size_gb         = string
+    zone_redundant      = bool
+    tags                = map(string)
+  }))
+
+}

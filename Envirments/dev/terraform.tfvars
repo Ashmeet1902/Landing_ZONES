@@ -192,3 +192,34 @@ storage_accounts = {
 
   }
 }
+sql_servers = {
+  "server1" = {
+    name                         = "sqlserverdevashmeet"
+    resource_group_name          = "myResourceGroup"
+    location                     = "Central India"
+    version                      = "12.0"
+    administrator_login          = "sqladminuser"
+    administrator_login_password = "SqlP@ssw0rd1234!"
+    tags = {
+      environment = "dev"
+    }
+
+  }
+}
+sql_databases = {
+  "DB1" = {
+    name                = "sqldbdevashmeet"
+    resource_group_name = "myResourceGroup"
+    location            = "Central India"
+    server_name         = "sqlserverdevashmeet"
+    edition             = "Basic"
+    zone_redundant      = false
+    sku_name           = "Basic"
+    max_size_gb         = "2"
+    requested_service_objective_name = "Basic"
+    tags = {
+      environment = "dev"
+    }
+    
+  }
+}

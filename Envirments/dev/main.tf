@@ -76,4 +76,15 @@ module "storage_accounts" {
   storage_accounts = var.storage_accounts
 
 }
+module "sql_servers" {
+  depends_on  = [module.rg]
+  source      = "../../Modules/Azure_rm_SQL_Server"
+  sql_servers = var.sql_servers
+
+}
+module "sql_DB" {
+  depends_on    = [module.sql_servers]
+  source        = "../../Modules/Azurerm_DB"
+  sql_databases = var.sql_databases
+}
 
