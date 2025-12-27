@@ -21,6 +21,17 @@ public_ip = {
     }
 
   }
+  pip3 = {
+    name                = "mypip3"
+    location            = "Central India"
+    resource_group_name = "myResourceGroup"
+    allocation_method   = "Static"
+    sku                 = "Standard"
+    tags = {
+      environment = "dev"
+    }
+
+  }
 }
 vnets = {
   "vnet1" = {
@@ -86,6 +97,18 @@ nics = {
     }
 
   }
+  nic2 = {
+    name                = "myNic2"
+    location            = "Central India"
+    resource_group_name = "myResourceGroup"
+    subnet_name         = "subnet1"
+    vnet_name           = "myVnet1"
+    public_ip_name      = "mypip3"
+    tags = {
+      environment = "dev"
+    }
+
+  }
 }
 vms = {
   "vm1" = {
@@ -96,6 +119,29 @@ vms = {
     size                            = "Standard_B1s"
     admin_username                  = "adminuser"
     admin_password                  = "P@ssw0rd1234!"
+    key_vault_name                  = "ashmeetkeyvault007"
+    key_vault_resource_group_name   = "myResourceGroup"
+    key_vault_secret_admin_username = "username"
+    key_vault_secret_admin_password = "password"
+    source_image_reference = {
+      publisher = "Canonical"
+      offer     = "UbuntuServer"
+      sku       = "18.04-LTS"
+      version   = "latest"
+    }
+    tags = {
+      environment = "dev"
+    }
+
+  }
+  vm2 = {
+    name                            = "myVM2"
+    location                        = "Central India"
+    resource_group_name             = "myResourceGroup"
+    nic_name                        = "myNic2"
+    size                            = "Standard_B2s"
+    admin_username                  = "adminuser2"
+    admin_password                  = "P@ssw0rd5678!"
     key_vault_name                  = "ashmeetkeyvault007"
     key_vault_resource_group_name   = "myResourceGroup"
     key_vault_secret_admin_username = "username"
@@ -208,18 +254,18 @@ sql_servers = {
 }
 sql_databases = {
   "DB1" = {
-    name                = "sqldbdevashmeet"
-    resource_group_name = "myResourceGroup"
-    location            = "Central India"
-    server_name         = "sqlserverdevashmeet"
-    edition             = "Basic"
-    zone_redundant      = false
-    sku_name           = "Basic"
-    max_size_gb         = "2"
+    name                             = "sqldbdevashmeet"
+    resource_group_name              = "myResourceGroup"
+    location                         = "Central India"
+    server_name                      = "sqlserverdevashmeet"
+    edition                          = "Basic"
+    zone_redundant                   = false
+    sku_name                         = "Basic"
+    max_size_gb                      = "2"
     requested_service_objective_name = "Basic"
     tags = {
       environment = "dev"
     }
-    
+
   }
 }
